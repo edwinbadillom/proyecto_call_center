@@ -58,11 +58,13 @@ public class CallCenterDAOImpl implements CallCenterDAO {
 	public synchronized void inhabilitarEmpleado ( String codigoEmpleado ) throws CallCenterDAOException {
 		
 		procesarDisponibilidad( codigoEmpleado, false );
+		
 	}
 
 	public synchronized void habilitarEmpleado ( String codigoEmpleado ) throws CallCenterDAOException {
 		
 		procesarDisponibilidad( codigoEmpleado, true );
+
 	}
 	
 	private void procesarDisponibilidad ( String codigoEmpleado, boolean snDisponible ) throws CallCenterDAOException {
