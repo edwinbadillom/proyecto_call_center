@@ -56,49 +56,37 @@ public class CallCenterDAOImpl implements CallCenterDAO {
 	}
 
 	public synchronized void inhabilitarEmpleado ( String codigoEmpleado ) throws CallCenterDAOException {
-		Empleado empleado = null;
-
-		try {
-			for ( int i = 0; i < empleados.size(); i++ ) {
-				empleado = empleados.get( i );
-
-				if ( empleado.getCodigo().equals( codigoEmpleado ) ) {
-
-					empleado.setSnDisponible( false );
-
-					empleados.set( i, empleado );
-
-					LOGGER.info( "Empleado inhabilitado [codigo = " + codigoEmpleado + ", tipo = " + empleado.getTipo() + "]" );
-					
-					break;
-				}
-			}
-		} catch ( Exception e ) {
-			throw new CallCenterDAOException( e );
-		}
+		
+		procesarDisponibilidad( codigoEmpleado, false );
 	}
 
 	public synchronized void habilitarEmpleado ( String codigoEmpleado ) throws CallCenterDAOException {
+		
+		procesarDisponibilidad( codigoEmpleado, true );
+	}
+	
+	private void procesarDisponibilidad ( String codigoEmpleado, boolean snDisponible ) throws CallCenterDAOException {
 		Empleado empleado = null;
 
 		try {
-			for ( int i = 0; i < empleados.size(); i++ ) {
-				empleado = empleados.get( i );
-
-				if ( empleado.getCodigo().equals( codigoEmpleado ) ) {
-
-					empleado.setSnDisponible( true );
-
-					empleados.set( i, empleado );
-					
-					LOGGER.info( "Empleado habilitado [codigo = " + codigoEmpleado + ", tipo = " + empleado.getTipo() + "]" );
-
-					break;
-				}
+			empleado = buscarEmpleadoPorCodigo( codigoEmpleado );
+			
+			if ( empleado == null ) {
+				throw new Exception( "No existe empleado con codigo: " + codigoEmpleado );
 			}
+			
+			empleado.setSnDisponible( snDisponible );
+			
+			empleados.removeIf( e -> e.getCodigo().equals( codigoEmpleado ) );
+
+			empleados.add( empleado );
+			
+			LOGGER.info( "Empleado " + ( snDisponible ? "habilitado" : "inahilitado" ) + " [codigo = " + codigoEmpleado + ", tipo = " + empleado.getTipo() + "]" );
+			
 		} catch ( Exception e ) {
 			throw new CallCenterDAOException( e );
 		}
+		
 	}
 
 	public synchronized Empleado buscarEmpleadoDisponible ( ) throws CallCenterDAOException {
